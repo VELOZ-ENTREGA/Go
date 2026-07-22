@@ -149,13 +149,14 @@
      - SERVICE_ID:  Email Services → your connected service
      - TEMPLATE_ID: Email Templates → your template
      ============================================================ */
-  const PUBLIC_KEY  = "YOUR_PUBLIC_KEY";
-  const SERVICE_ID  = "YOUR_SERVICE_ID";
-  const TEMPLATE_ID = "YOUR_TEMPLATE_ID";
+  const PUBLIC_KEY  = "XTOjx1Jkt8RG_UeHk";
+  const SERVICE_ID  = "service_twytqge";
+  const TEMPLATE_ID = "template_2vg1gl2";
 
-  /* The message body sent inside the {{message}} variable of your
-     EmailJS template. Edit this freely — it's the only "content"
-     field since the form itself only collects the 3 fields above. */
+  /* The message body sent inside the {{message}} variable, if your
+     template still uses one. The current romantic template has the
+     letter text baked in directly, so this constant is unused there —
+     safe to ignore, or delete if you don't need it. */
   const DEFAULT_MESSAGE = "Just a little note to brighten your day. Wishing you all the best!";
 
   emailjs.init({ publicKey: PUBLIC_KEY });
