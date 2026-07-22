@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Send a Little Note</title>
+
+<!-- EmailJS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #efe7da;
+    font-family: Georgia, 'Times New Roman', serif;
+    padding: 24px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 440px;
+    background: #fffdf8;
+    border: 1px solid #e6d6b0;
+    border-radius: 14px;
+    padding: 40px 36px 32px;
+    box-shadow: 0 10px 40px rgba(91,58,30,0.12);
+  }
+
+  .flourish {
+    text-align: center;
+    color: #c9a24a;
+    font-size: 20px;
+    letter-spacing: 4px;
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    text-align: center;
+    color: #5b3a1e;
+    font-size: 26px;
+    font-weight: normal;
+    margin: 0 0 6px;
+  }
+
+  p.subtitle {
+    text-align: center;
+    color: #8a7458;
+    font-size: 14px;
+    margin: 0 0 28px;
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    color: #5b3a1e;
+    margin: 0 0 6px;
+  }
+
+  .field { margin-bottom: 18px; }
+
+  input[type="text"],
+  input[type="email"] {
+    width: 100%;
+    padding: 12px 14px;
+    font-family: Georgia, serif;
+    font-size: 15px;
+    color: #3a2a18;
+    background: #fffefb;
+    border: 1px solid #e2c98a;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  input[type="text"]:focus,
+  input[type="email"]:focus {
+    border-color: #c9a24a;
+    box-shadow: 0 0 0 3px rgba(201,162,74,0.18);
+  }
+
+  button {
+    width: 100%;
+    margin-top: 8px;
+    padding: 14px;
+    font-family: Georgia, serif;
+    font-size: 15px;
+    letter-spacing: 1px;
+    color: #fffdf8;
+    background: #5b3a1e;
+    border: none;
+    border-radius: 26px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  button:hover { background: #462c15; }
+  button:active { transform: scale(0.98); }
+  button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .status {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 14px;
+    min-height: 20px;
+  }
+  .status.success { color: #3f7d4f; }
+  .status.error { color: #b3452e; }
+</style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="flourish">&#10086;&nbsp;&nbsp;&#10086;&nbsp;&nbsp;&#10086;</div>
+    <h1>Send a Little Note</h1>
+    <p class="subtitle">Fill in the details below and send a warm message.</p>
+
+    <form id="noteForm">
+      <div class="field">
+        <label for="senderName">Sender's Name</label>
+        <input type="text" id="senderName" name="senderName" placeholder="Your name" required />
+      </div>
+
+      <div class="field">
+        <label for="receiverName">Receiver's Name</label>
+        <input type="text" id="receiverName" name="receiverName" placeholder="Their name" required />
+      </div>
+
+      <div class="field">
+        <label for="receiverEmail">Receiver's Email Address</label>
+        <input type="email" id="receiverEmail" name="receiverEmail" placeholder="their@email.com" required />
+      </div>
+
+      <button type="submit" id="sendBtn">Send</button>
+      <div id="status" class="status"></div>
+    </form>
+  </div>
+
+<script>
+  /* ============================================================
+     STEP 1 — Fill in your own EmailJS credentials below.
+     Get these from https://dashboard.emailjs.com
+     - PUBLIC_KEY:  Account → General → Public Key
+     - SERVICE_ID:  Email Services → your connected service
+     - TEMPLATE_ID: Email Templates → your template
+     ============================================================ */
+  const PUBLIC_KEY  = "YOUR_PUBLIC_KEY";
+  const SERVICE_ID  = "YOUR_SERVICE_ID";
+  const TEMPLATE_ID = "YOUR_TEMPLATE_ID";
+
+  /* The message body sent inside the {{message}} variable of your
+     EmailJS template. Edit this freely — it's the only "content"
+     field since the form itself only collects the 3 fields above. */
+  const DEFAULT_MESSAGE = "Just a little note to brighten your day. Wishing you all the best!";
+
+  emailjs.init({ publicKey: PUBLIC_KEY });
+
+  const form = document.getElementById("noteForm");
+  const sendBtn = document.getElementById("sendBtn");
+  const statusEl = document.getElementById("status");
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const senderName = document.getElementById("senderName").value.trim();
+    const receiverName = document.getElementById("receiverName").value.trim();
+    const receiverEmail = document.getElementById("receiverEmail").value.trim();
+
+    statusEl.textContent = "";
+    statusEl.className = "status";
+
+    if (!senderName || !receiverName || !receiverEmail) {
+      statusEl.textContent = "Please fill in all fields.";
+      statusEl.className = "status error";
+      return;
+    }
+
+    const templateParams = {
+      from_name: senderName,
+      to_name: receiverName,
+      to_email: receiverEmail,
+      message: DEFAULT_MESSAGE
+    };
+
+    sendBtn.disabled = true;
+    sendBtn.textContent = "Sending...";
+
+    emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
+      .then(function () {
+        statusEl.textContent = "Note sent successfully!";
+        statusEl.className = "status success";
+        form.reset();
+      })
+      .catch(function (err) {
+        statusEl.textContent = "Something went wrong. Please try again.";
+        statusEl.className = "status error";
+        console.error("EmailJS error:", err);
+      })
+      .finally(function () {
+        sendBtn.disabled = false;
+        sendBtn.textContent = "Send";
+      });
+  });
+</script>
+
+</body>
+</html>
